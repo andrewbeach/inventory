@@ -9,6 +9,7 @@ import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect)
 import Inventory.Capability.ManageRecipe (class ManageRecipe)
+import Inventory.Capability.ManageUser (class ManageUser)
 import Inventory.Db as Db
 import Type.Equality (class TypeEquals, from)
 
@@ -56,3 +57,8 @@ instance manageRecipeApiM :: ManageRecipe ApiM where
     let q = PG.Query "insert into ingredients_to_recipes (recipe_id, ingredient_id, parts) values ($1, $2, $3)" 
     in Db.withPool $ PG.execute q (toSql <$> [rid, iid, parts])
                    
+instance manageUserApiM :: ManageUser ApiM where 
+  saveUser u = 
+    let query = PG.Query "insert into users (fname, lname) values ($1, $2)" 
+        params = toSql <$> [u.fname, u.lname] 
+    in Db.withPool $ PG.query Db.read query params
